@@ -64,6 +64,12 @@
         }
     };
 
+    // Save list of cities to localStorage.
+     app.saveSelectedTimetable = function() {
+       var selectedTimetables = JSON.stringify(app.selectedTimetables);
+       localStorage.selectedTimetables = selectedTimetables;
+     };
+
     // Updates a timestation card with the latest weather forecast. If the card
     // doesn't already exist, it's cloned from the template.
 
@@ -179,9 +185,22 @@
      *   Instead, check out IDB (https://www.npmjs.com/package/idb) or
      *   SimpleDB (https://gist.github.com/inexorabletash/c8069c042b734519680c)
      ************************************************************************/
-
-    app.getSchedule('metros/1/bastille/A', 'Bastille, Direction La Défense');
-    app.selectedTimetables = [
-        {key: initialStationTimetable.key, label: initialStationTimetable.label}
-    ];
+     app.selectedTimetables = localStorage.selectedTimetables;
+     if (app.selectedTimetables) {
+       app.selectedTimetables = JSON.parse(app.selectedTimetables);
+       app.selectedTimetables.forEach(function(timetable) {
+         app.getSchedule(timetable.key, timetable.label);
+       });
+     } else {
+       /* The user is using the app for the first time, or the user has not
+        * saved any cities, so show the user some fake data. A real app in this
+        * scenario could guess the user's location via IP lookup and then inject
+        * that data into the page.
+        */
+       app.updateTimetableCard(initialStationTimetable);
+       app.selectedTimetables = [
+         {key: initialStationTimetable.key, label: initialStationTimetable.label}
+       ];
+       app.saveSelectedTimetable();
+     }
 })();

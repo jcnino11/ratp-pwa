@@ -40,6 +40,7 @@
         }
         app.getSchedule(key, label);
         app.selectedTimetables.push({key: key, label: label});
+        app.saveSelectedTimetables();
         app.toggleAddDialog(false);
     });
 
@@ -65,7 +66,7 @@
     };
 
     // Save list of cities to localStorage.
-     app.saveSelectedTimetable = function() {
+     app.saveSelectedTimetables = function() {
        var selectedTimetables = JSON.stringify(app.selectedTimetables);
        localStorage.selectedTimetables = selectedTimetables;
      };
@@ -155,7 +156,6 @@
      */
 
     var initialStationTimetable = {
-
         key: 'metros/1/bastille/A',
         label: 'Bastille, Direction La Défense',
         created: '2017-07-18T17:08:42+02:00',
@@ -170,11 +170,7 @@
                 message: '5 mn'
             }
         ]
-
-
     };
-
-
     /************************************************************************
      *
      * Code required to start the app
@@ -201,6 +197,12 @@
        app.selectedTimetables = [
          {key: initialStationTimetable.key, label: initialStationTimetable.label}
        ];
-       app.saveSelectedTimetable();
+       app.saveSelectedTimetables();
      }
+
+     if ('serviceWorker' in navigator) {
+       navigator.serviceWorker
+              .register('./service-worker.js')
+              .then(function() { console.log('Service Worker Registered'); });
+   }
 })();
